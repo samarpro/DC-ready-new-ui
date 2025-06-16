@@ -15,6 +15,17 @@ import uuid
 st.set_page_config(page_title="Deakin College Chatbot", layout="centered")
 load_dotenv()
 
+# removing github icons
+hide_toolbar_css = """
+<style>
+    div.stToolbarActionButton {
+        display: none;
+    }
+</style>
+"""
+
+st.markdown(hide_toolbar_css, unsafe_allow_html=True)
+
 def disclaimer_popup():
     if "agreed" not in st.session_state:
         st.session_state.agreed = False
@@ -45,16 +56,7 @@ def disclaimer_popup():
 
 # Call this at the start of your Streamlit app
 disclaimer_popup()
-# removing github icons
-hide_toolbar_css = """
-<style>
-    div.stToolbarActionButton {
-        display: none;
-    }
-</style>
-"""
 
-st.markdown(hide_toolbar_css, unsafe_allow_html=True)
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -168,7 +170,7 @@ class RAGCore:
 
             Answer user queries using only the information provided in the context below. Your goal is to deliver clear, comprehensive, and student-friendly responses. Where appropriate, include explanations that help the student understand the background, reasoning, or implications of the information.
             Answering Guidelines:
-            If the input is a greeting or casual message (e.g., "hi", "thanks"), respond politely and explain you're here to help with academic questions.
+            If the input is a greeting or casual message (e.g., "hi", "thanks"), respond politely and explain you're here to help with academic questions, and get quick information about Deakin College.
             Be thorough and descriptive. Include all relevant details from the context. When applicable, expand on key points to help the student better understand the subject.
             Define or briefly explain technical terms or concepts that may be unfamiliar to a student.
             If the question involves a process, policy, or option, describe each step or component clearly.
