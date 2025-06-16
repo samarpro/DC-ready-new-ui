@@ -14,7 +14,7 @@ st.set_page_config(page_title="Deakin College Chatbot", layout="centered")
 load_dotenv()
 hide_toolbar_css = """
 <style>
-    div.stAppToolbar {
+    div.stToolbarActionButton {
         display: none;
     }
 </style>
