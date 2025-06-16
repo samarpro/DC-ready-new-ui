@@ -15,17 +15,6 @@ import uuid
 st.set_page_config(page_title="Deakin College Chatbot", layout="centered")
 load_dotenv()
 
-# removing github icons
-hide_toolbar_css = """
-<style>
-    div.stToolbarActionButton {
-        display: none;
-    }
-</style>
-"""
-
-st.markdown(hide_toolbar_css, unsafe_allow_html=True)
-
 def disclaimer_popup():
     if "agreed" not in st.session_state:
         st.session_state.agreed = False
@@ -56,7 +45,16 @@ def disclaimer_popup():
 
 # Call this at the start of your Streamlit app
 disclaimer_popup()
+# removing github icons
+hide_toolbar_css = """
+<style>
+    div.stToolbarActionButton {
+        display: none;
+    }
+</style>
+"""
 
+st.markdown(hide_toolbar_css, unsafe_allow_html=True)
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -95,7 +93,7 @@ class RAGCore:
     
     # ---- Function: Simulate RAG retrieval (Replace with actual retrieval logic) ----
     @st.cache_resource(show_spinner=False)
-    def retrieve_documents(_self,query: str) -> List[str]:
+    def retrieve_documents(_self,query: str, org_query:str) -> List[str]:
         """Simulate retrieving relevant documents based on a query."""
         meta_dict = {}
         # here convo-> conversation, which means when user ask and AI replies. This is counted as one convo.
@@ -103,7 +101,7 @@ class RAGCore:
         _self.convo_uuid = str(uuid.uuid4())
         _self.supabase.insert({
             'uuid_id':_self.convo_uuid,
-            'query': query,
+            'query': org_query,
             'session_id': st.session_state.session_id
         }).execute()
         dense_query = _self.vc.embed_query(query)
@@ -170,7 +168,7 @@ class RAGCore:
 
             Answer user queries using only the information provided in the context below. Your goal is to deliver clear, comprehensive, and student-friendly responses. Where appropriate, include explanations that help the student understand the background, reasoning, or implications of the information.
             Answering Guidelines:
-            If the input is a greeting or casual message (e.g., "hi", "thanks"), respond politely and explain you're here to help with academic questions, and get quick information about Deakin College.
+            If the input is a greeting or casual message (e.g., "hi", "thanks"), respond politely and explain you're here to help with academic questions.
             Be thorough and descriptive. Include all relevant details from the context. When applicable, expand on key points to help the student better understand the subject.
             Define or briefly explain technical terms or concepts that may be unfamiliar to a student.
             If the question involves a process, policy, or option, describe each step or component clearly.
@@ -221,7 +219,7 @@ if st.session_state.chat_history == []:
             'content': initial_input
         })
         query = rag.perform_query_expansion(initial_input)
-        (retrieved_docs, meta_dict, _uuid) = rag.retrieve_documents(query)
+        (retrieved_docs, meta_dict, _uuid) = rag.retrieve_documents(query, initial_input)
 
         response = rag.generate_response(initial_input, retrieved_docs)
         final_response = rag.convert_links_to_markdown(response, meta_dict)
@@ -270,8 +268,8 @@ if query:
         st.write("Updating the UI")
         
         st.write("Getting query vectors and relevant documents")
-        query = rag.perform_query_expansion(query)
-        (retrieved_docs, meta_dict, _uuid) = rag.retrieve_documents(query)
+        new_query = rag.perform_query_expansion(query)
+        (retrieved_docs, meta_dict, _uuid) = rag.retrieve_documents(new_query,query)
         st.write("Synthesizing answer (thinking)")
         response = rag.generate_response(query, retrieved_docs)
         final_response = rag.convert_links_to_markdown(response, meta_dict)
