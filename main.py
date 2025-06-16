@@ -12,7 +12,15 @@ from pathlib import Path
 
 st.set_page_config(page_title="Deakin College Chatbot", layout="centered")
 load_dotenv()
+hide_toolbar_css = """
+<style>
+    div.stAppToolbar {
+        display: none;
+    }
+</style>
+"""
 
+st.markdown(hide_toolbar_css, unsafe_allow_html=True)
 class RAGCore:
     def __init__(self):
         print("Running the ragcore")
