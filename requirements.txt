@@ -5,3 +5,4 @@ protobuf==6.31.1
 python-dotenv==1.1.0
 qdrant_client==1.14.2
 google-genai==1.19.0
+supabase==2.15.3
